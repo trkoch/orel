@@ -11,7 +11,7 @@ export function Repository ({entity: Entity, table, db}) {
       return Entity.collection(rows)
     }
 
-    async findWhere (attributes: Object, fn?: Function): Promise<Entity|false> {
+    async findWhere (attributes: Object): Promise<Entity|false> {
       const rows = await this._where(attributes, query => query.limit(1))
       if (rows[0]) {
         const entity = Entity.fromColumns(rows[0])
@@ -22,8 +22,8 @@ export function Repository ({entity: Entity, table, db}) {
       }
     }
 
-    async find (id: number, fn?: Function): Promise<Entity> {
-      const entity = await this.findWhere({id}, fn)
+    async find (id: number): Promise<Entity> {
+      const entity = await this.findWhere({id})
       if (!entity) throw new Error('Record not found')
       return entity
     }
@@ -47,7 +47,7 @@ export function Repository ({entity: Entity, table, db}) {
       return query
     }
 
-    async create (entity: Entity, fn?: Function): Promise<Entity> {
+    async create (entity: Entity): Promise<Entity> {
       let query = db(table).insert(entity.columns)
       if (await entity.validate()) {
         const [id] = await query
@@ -57,7 +57,7 @@ export function Repository ({entity: Entity, table, db}) {
       }
     }
 
-    async update (id: number, entity: Entity, fn?: Function): Promise<Entity> {
+    async update (id: number, entity: Entity): Promise<Entity> {
       if (await entity.validate()) {
         let query = db(table).update(entity.columns).where({id})
         await query
@@ -67,7 +67,7 @@ export function Repository ({entity: Entity, table, db}) {
       }
     }
 
-    async delete (id: number, fn?: Function): Promise<number> {
+    async delete (id: number): Promise<number> {
       let query = db(table).delete().where({id})
       return await query
     }
